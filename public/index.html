@@ -297,6 +297,42 @@
 </div>
 <script>
 "use strict";
+// ABUM UPGRADE: сообщаем Telegram о готовности сразу.
+try {
+  const tgBoot = window.Telegram && window.Telegram.WebApp;
+  if (tgBoot) {
+    tgBoot.ready();
+    try {
+      tgBoot.expand();
+    } catch (_) {}
+  }
+} catch (e) {
+  console.error("ABUM Telegram startup:", e);
+}
+
+// Показываем ошибки запуска на экране приложения.
+window.addEventListener("error", function (event) {
+  const status = document.getElementById("serverStatus");
+  if (status) {
+    status.textContent =
+      "⚠️ Ошибка запуска: " +
+      String(event.message || "Неизвестная ошибка");
+  }
+});
+
+window.addEventListener("unhandledrejection", function (event) {
+  const status = document.getElementById("serverStatus");
+  if (status) {
+    const reason = event.reason;
+    status.textContent =
+      "⚠️ Ошибка приложения: " +
+      String(
+        reason && reason.message
+          ? reason.message
+          : reason || "Неизвестная ошибка"
+      );
+  }
+});
 const API_BASE = "/api/";
 // All sensitive operations are validated server-side; do not put tokens/API keys in this file.
 const NFT_ART = {
