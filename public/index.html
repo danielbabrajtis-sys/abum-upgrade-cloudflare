@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#090711">
 <title>ABUM UPGRADE</title>
 <!-- ABUM UPGRADE Cloudflare migration build. API is same-origin under /api/; no server secrets are stored in client code. -->
-<script src="https://telegram.org/js/telegram-web-app.js?64"></script>
+<script async src="https://telegram.org/js/telegram-web-app.js" onerror="window.__abumTelegramWebAppLoadFailed = true"></script>
 <style>
 :root{--bg:#090711;--panel:#141020;--line:#302342;--purple:#a35cff;--pink:#d45bff;--text:#faf7ff;--muted:#9589a9;--green:#54edac;--red:#ff526d}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -10%,#392052,transparent 48%),var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button{font:inherit;cursor:pointer}button:focus-visible{outline:2px solid var(--pink);outline-offset:3px}.app{max-width:980px;margin:auto;padding:0 15px}.topbar{height:70px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff10;gap:10px}.brand{font-size:19px;font-weight:950;letter-spacing:-.8px}.brand b{color:#c28bff}.mark{display:inline-grid;place-items:center;width:35px;height:35px;margin-right:7px;border-radius:11px;background:linear-gradient(140deg,#b45cff,#5827bd)}.balance{padding:10px 12px;background:#191326;border:1px solid var(--line);border-radius:11px;font-size:12px;color:#dfc6ff;white-space:nowrap}.nav{display:flex;gap:7px;padding:15px 0;overflow:auto}.nav button{flex:1;white-space:nowrap;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--muted);padding:11px 13px;font-size:12px}.nav button.active{background:#21152f;color:white;border-color:#54346f}.hero{margin:10px 0 20px}.eyebrow{font-size:9px;letter-spacing:2.5px;color:#c58aff;font-weight:900}h1{font-size:clamp(27px,5vw,38px);letter-spacing:-1.3px;margin:8px 0}h1 span{color:#c28aff}.subtitle{font-size:13px;color:var(--muted);line-height:1.6;margin:0}.panel{background:linear-gradient(145deg,#171222,#100d19);border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 35px #0002}.main-grid{display:grid;grid-template-columns:minmax(0,1fr) 235px;gap:15px;align-items:start}.upgrade-panel{padding:19px;overflow:hidden}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.panel-head h2{font-size:14px;margin:0}.tag{font-size:9px;color:#d8b7ff;background:#29183b;border:1px solid #50306c;border-radius:7px;padding:6px 8px}.dial-wrap{padding:18px 0 8px;text-align:center}.dial{width:min(100%,310px);aspect-ratio:1;position:relative;margin:auto;border-radius:50%;padding:10px;background:linear-gradient(145deg,#30213f,#0c0a12);box-shadow:0 0 0 1px #49345c,0 0 35px #9d4dff13,inset 0 0 18px #0009}.dial-face{position:absolute;inset:10px;border-radius:50%;overflow:hidden;background:conic-gradient(from 0deg at 50% 50%,var(--green) 0 var(--chance),#ff526d var(--chance) 100%);border:5px solid #261b35}.dial-face:after{content:"";position:absolute;inset:13px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#21152f,#100c18 72%);border:1px solid #60427a}.tick-ring{position:absolute;inset:21px;border-radius:50%;z-index:2;pointer-events:none}.tick{position:absolute;left:50%;top:0;width:2px;height:9px;background:#ffffffa0;transform-origin:50% 119px;border-radius:2px}.pointer{position:absolute;z-index:5;inset:0;border-radius:50%;transform:rotate(0deg);transition:transform 4.6s cubic-bezier(.09,.7,.12,1)}.pointer:before{content:"";position:absolute;left:calc(50% - 3px);top:22px;width:6px;height:calc(50% - 31px);border-radius:7px;background:linear-gradient(to top,#c4a1ff,#fff);box-shadow:0 0 12px #b56affaa;transform-origin:50% 100%}.pointer:after{content:"";position:absolute;top:16px;left:calc(50% - 7px);width:14px;height:14px;background:#fff;border-radius:50%;box-shadow:0 0 14px #c48bff}.dial-center{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%);width:83px;height:83px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(145deg,#30203f,#120e1b);border:2px solid #684487;box-shadow:0 0 20px #0009}.dial-center strong{font-size:19px;color:#fff}.dial-center span{font-size:8px;letter-spacing:1px;color:#b8a0d1;margin-top:3px}.zone-label{position:absolute;z-index:4;font-size:9px;font-weight:950;letter-spacing:1px;text-shadow:0 1px 5px #000}.zone-win{top:43px;left:50%;transform:translateX(-50%);color:#9affd3}.zone-lose{bottom:43px;left:50%;transform:translateX(-50%);color:#ff9aa9}.dial-legend{display:flex;justify-content:center;gap:18px;margin-top:13px;font-size:10px;color:var(--muted)}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}.green-dot{background:var(--green)}.red-dot{background:var(--red)}.stages{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.stage{background:#0e0b16;border:1px solid #30223e;border-radius:13px;padding:12px 7px;text-align:center;min-width:0}.stage-label{font-size:9px;color:var(--muted);letter-spacing:1px;font-weight:800}.stage-art{height:61px;display:grid;place-items:center;font-size:37px;margin:7px 0}.stage-name{font-size:12px;font-weight:800;overflow-wrap:anywhere}.stage-price{font-size:11px;color:#c9a5ff;margin-top:5px}.choose-label{font-size:10px;color:var(--muted);margin:18px 0 9px}.select-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.select-box{width:100%;background:#100d19;color:white;border:1px solid #443050;border-radius:10px;padding:10px 8px;font-size:11px;min-width:0}.odds{margin-top:18px}.odds-top{display:flex;justify-content:space-between;align-items:center;font-size:11px;gap:8px}.odds-top span{color:var(--muted)}.odds-top strong{font-size:16px;color:#d6b0ff}.meter{height:6px;background:#302337;border-radius:9px;overflow:hidden;margin-top:9px}.meter-fill{height:100%;width:50%;background:linear-gradient(90deg,#873dff,#d86aff);transition:width .3s}.upgrade-btn{width:100%;border:0;border-radius:12px;padding:15px;margin-top:18px;background:linear-gradient(100deg,#7837e9,#a84bfa,#c45bff);color:white;font-weight:900;font-size:13px;box-shadow:0 6px 24px #8a3eff30}.upgrade-btn:disabled{opacity:.6;cursor:wait}.notice{text-align:center;font-size:10px;line-height:1.6;color:#82768f;margin:12px 0 0}.toast{font-size:12px;text-align:center;min-height:18px;margin-top:10px;color:#e2c7ff}
@@ -297,41 +297,24 @@
 </div>
 <script>
 "use strict";
-// ABUM UPGRADE: сообщаем Telegram о готовности сразу.
-try {
-  const tgBoot = window.Telegram && window.Telegram.WebApp;
-  if (tgBoot) {
-    tgBoot.ready();
-    try {
-      tgBoot.expand();
-    } catch (_) {}
-  }
-} catch (e) {
-  console.error("ABUM Telegram startup:", e);
-}
 
-// Показываем ошибки запуска на экране приложения.
+// Never let a Telegram bridge/network stall hide the whole Mini App.
 window.addEventListener("error", function (event) {
-  const status = document.getElementById("serverStatus");
-  if (status) {
-    status.textContent =
-      "⚠️ Ошибка запуска: " +
-      String(event.message || "Неизвестная ошибка");
-  }
+ const status = document.getElementById("serverStatus");
+ if (status) {
+  const message = String(event && event.message || "Неизвестная ошибка JavaScript").slice(0, 220);
+  status.textContent = "⚠️ Ошибка интерфейса: " + message;
+  status.style.borderColor = "#ff526d";
+ }
 });
-
 window.addEventListener("unhandledrejection", function (event) {
-  const status = document.getElementById("serverStatus");
-  if (status) {
-    const reason = event.reason;
-    status.textContent =
-      "⚠️ Ошибка приложения: " +
-      String(
-        reason && reason.message
-          ? reason.message
-          : reason || "Неизвестная ошибка"
-      );
-  }
+ const status = document.getElementById("serverStatus");
+ if (status) {
+  const reason = event && event.reason;
+  const message = String(reason && reason.message || reason || "Неизвестная ошибка приложения").slice(0, 220);
+  status.textContent = "⚠️ Ошибка приложения: " + message;
+  status.style.borderColor = "#ff526d";
+ }
 });
 const API_BASE = "/api/";
 // All sensitive operations are validated server-side; do not put tokens/API keys in this file.
@@ -765,33 +748,69 @@ function applyState(data){
  updateServerModeUI();
  renderSelects();renderInventory();renderCatalog();updateHistory();updateModeButtons();updateView();updateWithdrawAvailability();renderMyWithdrawals();
 }
+async function waitForTelegramWebApp(timeoutMs=10000){
+ const started=Date.now();
+ let telegramSeen=false;
+ while(Date.now()-started<timeoutMs){
+  const tg=window.Telegram&&window.Telegram.WebApp;
+  if(tg){
+   telegramSeen=true;
+   try{tg.ready();}catch(_){}
+   try{tg.expand();}catch(_){}
+   // In Telegram the signed initData must be present before profile requests begin.
+   if(typeof tg.initData==="string"&&tg.initData.length>0)return tg;
+  }
+  if(window.__abumTelegramWebAppLoadFailed){
+   throw new Error("Не удалось загрузить библиотеку Telegram. Проверь интернет и заново открой Mini App.");
+  }
+  await new Promise(resolve=>setTimeout(resolve,100));
+ }
+ if(telegramSeen)throw new Error("Telegram не передал данные входа (initData). Открой Mini App через меню основного бота, а не через обычную ссылку.");
+ throw new Error("Telegram WebApp не загрузился за 10 секунд. Закрой Mini App и открой её заново через меню основного бота.");
+}
 async function apiPost(path,payload){
  const tg=window.Telegram&&window.Telegram.WebApp;
- if(!tg||!tg.initData)throw new Error("Открой Mini App через меню основного Telegram-бота.");
- // application/x-www-form-urlencoded is a CORS-safelisted content type, so the
- // browser should not send an OPTIONS preflight. Values remain ordinary form fields.
+ if(!tg||!tg.initData)throw new Error("Telegram не передал данные входа. Открой Mini App через меню основного Telegram-бота.");
  const form=new URLSearchParams();
  const allFields={...payload,initData:tg.initData};
  for(const [key,value] of Object.entries(allFields)){
   if(value===undefined||value===null)continue;
   form.set(key,typeof value==="object"?JSON.stringify(value):String(value));
  }
- const response=await fetch(API_BASE+path,{method:"POST",body:form,cache:"no-store",credentials:"omit",referrerPolicy:"no-referrer"});
- const raw=await response.text();let result;
+ const controller=new AbortController();
+ const timeoutId=setTimeout(()=>controller.abort(),15000);
+ let response,raw;
+ try{
+  response=await fetch(API_BASE+path,{method:"POST",body:form,cache:"no-store",credentials:"omit",referrerPolicy:"no-referrer",signal:controller.signal});
+  raw=await response.text();
+ }catch(error){
+  if(error&&error.name==="AbortError")throw new Error("Сервер не ответил за 15 секунд. Проверь привязку D1 и логи Cloudflare.");
+  throw new Error("Не удалось подключиться к серверу: "+String(error&&error.message||error).slice(0,160));
+ }finally{clearTimeout(timeoutId);}
+ let result;
  try{result=JSON.parse(raw);}catch(_){throw new Error("HTTP "+response.status+": сервер вернул не JSON");}
- if(!response.ok||!result||result.ok!==true||!result.data||result.data.ok===false){throw new Error((result&&result.message)||(result&&result.data&&result.data.message)||("HTTP "+response.status));}
+ if(!response.ok||!result||result.ok!==true||!result.data||result.data.ok===false){
+  throw new Error((result&&result.message)||(result&&result.data&&result.data.message)||("HTTP "+response.status));
+ }
  return result.data;
 }
 async function loadProfile(){
- const status=$("serverStatus");const tg=window.Telegram&&window.Telegram.WebApp;
- try{if(tg){try{tg.ready();tg.expand();}catch(_){}}
- if(!tg||!tg.initData)throw new Error("Открой Mini App через меню основного Telegram-бота.");
- const data=await apiPost("app_state",{});applyState(data);
- if(currentMode==="stars"&&$("starRewardType").value==="gift"&&autoTargetMode){syncAutoTargetFromStake(false);renderSelects();renderCatalog();updateView();}
- await refreshMyWithdrawals(true);
- if(data.isAdmin){await refreshAdminWithdrawals(true);await refreshAdminPromos(true);}
- $("toast").textContent=myInventory().length?"Профиль загружен. Инвентарь сохранён на сервере.":"Профиль сохранён. Инвентарь пока пуст — подарок может начислить администратор.";
- }catch(e){console.error("ABUM profile load failed:",e);status.textContent="⚠️ Не удалось загрузить профиль: "+e.message;status.style.borderColor="#ff526d";$("balance").textContent="—";accountState=null;updateView();}
+ const status=$("serverStatus");
+ status.textContent="⏳ Подключаем Telegram и загружаем профиль…";
+ try{
+  const tg=await waitForTelegramWebApp(10000);
+  if(!tg.initData)throw new Error("Telegram открыл страницу, но не передал initData. Закрой окно и запусти приложение через кнопку меню основного бота.");
+  const data=await apiPost("app_state",{});applyState(data);
+  if(currentMode==="stars"&&$("starRewardType").value==="gift"&&autoTargetMode){syncAutoTargetFromStake(false);renderSelects();renderCatalog();updateView();}
+  await refreshMyWithdrawals(true);
+  if(data.isAdmin){await refreshAdminWithdrawals(true);await refreshAdminPromos(true);}
+  $("toast").textContent=myInventory().length?"Профиль загружен. Инвентарь сохранён на сервере.":"Профиль сохранён. Инвентарь пока пуст — подарок может начислить администратор.";
+ }catch(e){
+  console.error("ABUM profile load failed:",e);
+  status.textContent="⚠️ Не удалось загрузить профиль: "+String(e&&e.message||e).slice(0,240);
+  status.style.borderColor="#ff526d";
+  $("balance").textContent="—";accountState=null;updateView();
+ }
 }
 function resetWheelLabels(){
  const winLabel=document.querySelector('.zone-win'),loseLabel=document.querySelector('.zone-lose');
