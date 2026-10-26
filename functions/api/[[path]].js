@@ -291,6 +291,9 @@ async function abumAudit(db, event, userId, metadata) {
 }
 
 
+const ABUM_ODDS_EDGE_FACTOR = 0.93; // 7% disclosed house edge
+const ABUM_MAX_EFFECTIVE_CHANCE = 88.35; // 95% nominal cap × 0.93
+
 const ABUM_GIFT_CATALOG = [
   {id:'heart',name:'Сердце',icon:'❤️',price:15,rarity:'Common'},
   {id:'teddy',name:'Мишка',icon:'🧸',price:15,rarity:'Common',art:'teddy'},
@@ -333,7 +336,17 @@ const ABUM_GIFT_CATALOG = [
   {id:'cigar',name:'Сигара',icon:'🚬',price:3857,rarity:'Epic'},
   {id:'crystal',name:'Кристалл',icon:'🔮',price:5000,rarity:'Legendary',art:'crystal'},
   {id:'rare_gift',name:'Редкий подарок',icon:'🎁',price:7500,rarity:'Legendary',art:'giftbox'},
-  {id:'nft_gift',name:'NFT-подарок',icon:'🌌',price:10000,rarity:'Legendary',art:'crystal'}
+  {id:'nft_gift',name:'NFT-подарок',icon:'🌌',price:10000,rarity:'Legendary',art:'crystal'},
+  {id:'snoop_dogg',name:'Snoop Dogg',icon:'😎',price:200,rarity:'Collectible'},
+  {id:'swag_bag',name:'Swag Bag',icon:'🛍️',price:500,rarity:'Collectible'},
+  {id:'mini_oscar',name:'Мини-Оскар',icon:'🏆',price:500,rarity:'Collectible'},
+  {id:'toy_bear',name:'Коллекционный мишка',icon:'🧸',price:500,rarity:'Collectible',art:'teddy'},
+  {id:'precious_peach',name:'Precious Peach',icon:'🍑',price:1000,rarity:'Rare'},
+  {id:'durovs_cap',name:'Кепка Дурова',icon:'🧢',price:1000,rarity:'Rare'},
+  {id:'astral_shard',name:'Астральный осколок',icon:'💠',price:500,rarity:'Collectible'},
+  {id:'nail_bracelet',name:'Nail Bracelet',icon:'📿',price:10000,rarity:'Legendary'},
+  {id:'plush_pepe',name:'Plush Pepe',icon:'🐸',price:2000,rarity:'Legendary'},
+  {id:'westside_sign',name:'Westside Sign',icon:'🪧',price:10000,rarity:'Legendary'}
 ];
 
 function abumAdminIds() {
@@ -886,7 +899,7 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
       const sourcePrice = Number(source.price || 0);
       if (!Number.isFinite(sourcePrice) || sourcePrice < 1) throw abumError('У исходного подарка некорректная стоимость.', 400);
       if (target.price <= sourcePrice) throw abumError('Целевой подарок должен быть дороже исходного.', 400);
-      chance = Math.max(0.01, Math.min(95, Number(((sourcePrice / target.price) * 100).toFixed(2))));
+      chance = Math.max(0.01, Math.min(ABUM_MAX_EFFECTIVE_CHANCE, Number(((sourcePrice / target.price) * 100 * ABUM_ODDS_EDGE_FACTOR).toFixed(2))));
       profile.attempts = Number(profile.attempts || 0) + 1;
       if (forceLossTestMode) {
         // Transparent test mode: show a loss but never remove the source item or create a reward.
@@ -910,8 +923,8 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
       stage = 'validate_star_bet';
       const stake = abumValidateStarsAmount(payload.stake, 'Ставка');
       chance = Number(payload.chance);
-      if (!Number.isFinite(chance) || chance < 0.1 || chance > 95) {
-        throw abumError('Шанс для режима ставок должен быть от 0,1% до 95%. Нулевой шанс недоступен.', 400);
+      if (!Number.isFinite(chance) || chance < 0.1 || chance > ABUM_MAX_EFFECTIVE_CHANCE) {
+        throw abumError('Фактический шанс для режима ставок должен быть от 0,1% до 88,35%. Нулевой шанс недоступен.', 400);
       }
       chance = Number(chance.toFixed(1));
       const rewardType = String(payload.rewardType || 'stars');
@@ -927,12 +940,12 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
         }
         // The real probability is derived from server-side catalogue price and stake.
         // Do not trust the chance sent by the browser.
-        chance = Number(((stake / Number(targetGift.price)) * 100).toFixed(2));
-        if (chance < 0.01 || chance > 95) throw abumError('Для выбранной ставки фактический шанс должен быть больше 0% и не выше 95%.', 400);
+        chance = Number(((stake / Number(targetGift.price)) * 100 * ABUM_ODDS_EDGE_FACTOR).toFixed(2));
+        if (chance < 0.01 || chance > ABUM_MAX_EFFECTIVE_CHANCE) throw abumError('Для выбранной ставки фактический шанс должен быть больше 0% и не выше 88,35%.', 400);
         minStake = 1;
       } else if (rewardType === 'stars') {
-        minStake = Math.ceil(chance / (100 - chance));
-        grossPayout = Math.floor(stake * 100 / chance);
+        minStake = Math.ceil(chance / (100 * ABUM_ODDS_EDGE_FACTOR - chance));
+        grossPayout = Math.floor(stake * 100 * ABUM_ODDS_EDGE_FACTOR / chance);
         if (stake < minStake || grossPayout <= stake) {
           throw abumError('Для шанса ' + chance + '% нужна ставка минимум ' + minStake + ' игровых ⭐, чтобы выигрыш был больше ставки.', 400);
         }
@@ -1472,6 +1485,23 @@ export async function onRequest(context) {
     return Response.json({ ok: false, message: 'Not an API route.' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
   }
   const apiPath = pathname.slice('/api/'.length).split('/').filter(Boolean).join('/');
+  if (apiPath === 'db_health') {
+    const headers = abumResponseHeaders(request, {});
+    if (!env.DB) {
+      return Response.json({ ok: false, statusCode: 503, message: 'D1 binding DB is missing. Add the abum-upgrade-db binding named DB in Pages Settings.' }, { status: 503, headers });
+    }
+    try {
+      const table = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?").bind('abum_documents').first();
+      if (!table) {
+        return Response.json({ ok: false, statusCode: 503, message: 'D1 is connected, but abum_documents is missing. Run schema.sql in the D1 Console.' }, { status: 503, headers });
+      }
+      await env.DB.prepare('SELECT doc_key FROM abum_documents LIMIT 1').first();
+      return Response.json({ ok: true, statusCode: 200, data: { ok: true, message: 'D1 connected; abum_documents table is ready.' } }, { status: 200, headers });
+    } catch (error) {
+      console.error('ABUM D1 health check failed:', String(error && error.message || error).slice(0, 200));
+      return Response.json({ ok: false, statusCode: 503, message: 'D1 query failed. Confirm the DB binding and schema.sql.' }, { status: 503, headers });
+    }
+  }
   const handler = logic[apiPath];
   if (typeof handler !== 'function') {
     return Response.json({ ok: false, statusCode: 404, message: 'Unknown API path: ' + apiPath }, { status: 404, headers: abumResponseHeaders(request, {}) });
