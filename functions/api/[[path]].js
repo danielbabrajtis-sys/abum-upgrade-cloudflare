@@ -4,8 +4,6 @@
 */
 const logic = Object.create(null);
 const process = { env: {} };
-const ABUM_HOUSE_EDGE_PERCENT = 10;
-const ABUM_RETURN_FACTOR = (100 - ABUM_HOUSE_EDGE_PERCENT) / 100;
 const ABUM_KEY_FIELDS = {
   appusers: 'userId',
   appsettings: 'settingKey',
@@ -294,61 +292,42 @@ async function abumAudit(db, event, userId, metadata) {
 
 
 const ABUM_GIFT_CATALOG = [
-  {id:"heart", name:"Сердце", icon:"❤️", price:15, rarity:"Common"},
-  {id:"teddy", name:"Мишка", icon:"🧸", price:15, rarity:"Common", art:"teddy"},
-  {id:"gift", name:"Подарок", icon:"🎁", price:25, rarity:"Common", art:"giftbox"},
-  {id:"rose", name:"Роза", icon:"🌹", price:25, rarity:"Common", art:"rose"},
-  {id:"cake", name:"Торт", icon:"🎂", price:50, rarity:"Classic", art:"cake"},
-  {id:"bouquet", name:"Букет", icon:"💐", price:50, rarity:"Classic", art:"bouquet"},
-  {id:"rocket", name:"Ракета", icon:"🚀", price:50, rarity:"Classic", art:"rocket"},
-  {id:"champagne", name:"Бутылка шампанского", icon:"🍾", price:50, rarity:"Classic"},
-  {id:"trophy", name:"Трофей", icon:"🏆", price:100, rarity:"Rare"},
-  {id:"ring", name:"Кольцо", icon:"💍", price:100, rarity:"Rare", art:"ring"},
-  {id:"diamond", name:"Бриллиант", icon:"💎", price:100, rarity:"Rare", art:"diamond"},
-  {id:"chill_flame", name:"Chill Flame", icon:"🔥", price:500, rarity:"Collectible", art:"chill_flame"},
-  {id:"wise_scream", name:"Wise Scream", icon:"😱", price:500, rarity:"Collectible", art:"wise_scream"},
-  {id:"liberty_figure", name:"Liberty Figure", icon:"🗽", price:570, rarity:"Collectible", art:"liberty_statue"},
-  {id:"mirage_lamp", name:"Mirage Lamp", icon:"🪔", price:500, rarity:"Collectible", art:"mirage_lamp"},
-  {id:"snap_duck", name:"Snap Duck", icon:"🦆", price:600, rarity:"Collectible", art:"snap_duck"},
-  {id:"instant_ramen", name:"Instant Ramen", icon:"🍜", price:450, rarity:"Collectible", art:"instant_ramen"},
-  {id:"ice_cream", name:"Ice Cream", icon:"🍦", price:500, rarity:"Collectible", art:"ice_cream"},
-  {id:"lollipop_nft", name:"Lollipop", icon:"🍭", price:470, rarity:"Collectible", art:"lollipop"},
-  {id:"pool_float", name:"Pool Float", icon:"🛟", price:450, rarity:"Collectible", art:"pool_float"},
-  {id:"mood_pack", name:"Mood Pack", icon:"🎭", price:555, rarity:"Collectible", art:"mood_pack"},
-  {id:"swag_bag", name:"Swag Bag", icon:"🛍️", price:569, rarity:"Collectible", art:"swag_bag"},
-  {id:"happy_brown", name:"Happy Brown", icon:"🤎", price:520, rarity:"Collectible", art:"happy_brown"},
-  {id:"lunar_snake", name:"Lunar Snake", icon:"🐍", price:450, rarity:"Collectible", art:"lunar_snake"},
-  {id:"vip_cupcake", name:"VIP Cupcake", icon:"🧁", price:444, rarity:"Collectible", art:"cake"},
-  {id:"candy_cane", name:"Candy Cane", icon:"🍬", price:450, rarity:"Collectible", art:"candy_cane"},
-  {id:"coral_pin", name:"Coral Pin", icon:"🪸", price:560, rarity:"Collectible", art:"coral_pin"},
-  {id:"xmas_stocking", name:"Xmas Stocking", icon:"🧦", price:400, rarity:"Collectible", art:"xmas_stocking"},
-  {id:"fresh_sock", name:"Fresh Sock", icon:"🧦", price:563, rarity:"Collectible", art:"fresh_sock"},
-  {id:"snape_box", name:"Snape Box", icon:"📦", price:440, rarity:"Collectible", art:"snape_box"},
-  {id:"music_cake", name:"Music Cake", icon:"🎂", price:500, rarity:"Collectible", art:"cake"},
-  {id:"pet_snake", name:"Pet Snake", icon:"🐍", price:500, rarity:"Collectible", art:"pet_snake"},
-  {id:"fate_amulet", name:"Fate Amulet", icon:"🔮", price:570, rarity:"Collectible", art:"fate_amulet"},
-  {id:"jester_head", name:"Jester Head", icon:"🤡", price:550, rarity:"Collectible", art:"jester_head"},
-  {id:"cookie_heart", name:"Cookie Heart", icon:"🍪", price:570, rarity:"Collectible", art:"cookie_heart"},
-  {id:"birthday_candle", name:"Birthday Candle", icon:"🕯️", price:570, rarity:"Collectible", art:"cake"},
-  {id:"victory_medal", name:"Victory Medal", icon:"🏅", price:600, rarity:"Collectible", art:"victory_medal"},
-  {id:"spring_basket", name:"Spring Basket", icon:"🧺", price:620, rarity:"Collectible", art:"spring_basket"},
-  {id:"snoop_with_cigar", name:"Snoop with Cigar", icon:"🚬", price:1500, rarity:"Rare", art:"snoop_with_cigar"},
-  {id:"light_sword", name:"Light Sword", icon:"⚔️", price:570, rarity:"Collectible", art:"light_sword"},
-  {id:"input_k", name:"Input K", icon:"🔑", price:570, rarity:"Collectible", art:"input_k"},
-  {id:"time_alice_book", name:"Time Alice Book", icon:"📕", price:600, rarity:"Collectible", art:"time_alice_book"},
-  {id:"party_sparkle", name:"Party Sparkle", icon:"🎉", price:500, rarity:"Collectible", art:"party_sparkle"},
-  {id:"pretty_pussy", name:"Pretty Pussy", icon:"🐱", price:600, rarity:"Collectible", art:"pretty_pussy"},
-  {id:"cholly_chimp", name:"Cholly Chimp", icon:"🐒", price:700, rarity:"Collectible", art:"cholly_chimp"},
-  {id:"desk_calendar", name:"Desk Calendar", icon:"📅", price:600, rarity:"Collectible", art:"desk_calendar"},
-  {id:"stellar_rocket", name:"Stellar Rocket", icon:"🚀", price:570, rarity:"Collectible", art:"rocket"},
-  {id:"lucky_locket", name:"Lucky Locket", icon:"📿", price:1800, rarity:"Rare", art:"lucky_locket"},
-  {id:"homemade_cake", name:"Homemade Cake", icon:"🍰", price:650, rarity:"Collectible", art:"cake"},
-  {id:"moon_pendant", name:"Moon Pendant", icon:"🌙", price:650, rarity:"Collectible", art:"moon_charm"},
-  {id:"ginger_cookie", name:"Ginger Cookie", icon:"🍪", price:600, rarity:"Collectible", art:"ginger_cookie"},
-  {id:"tamagot_gadget", name:"Tamagot Gadget", icon:"🕹️", price:600, rarity:"Collectible", art:"tamagot_gadget"},
-  {id:"ufc_strike", name:"UFC Strike", icon:"🥊", price:1500, rarity:"Rare", art:"ufc_strike"},
-  {id:"jelly_bunny", name:"Jelly Bunny", icon:"🐰", price:750, rarity:"Collectible", art:"jelly_bunny"},
-  {id:"retro_jar", name:"Retro Jar", icon:"🏺", price:500, rarity:"Collectible", art:"retro_jar", estimated:true}
+  {id:'heart',name:'Сердце',icon:'❤️',price:15,rarity:'Common'},
+  {id:'teddy',name:'Мишка',icon:'🧸',price:15,rarity:'Common',art:'teddy'},
+  {id:'gift',name:'Подарок',icon:'🎁',price:25,rarity:'Common',art:'giftbox'},
+  {id:'rose',name:'Роза',icon:'🌹',price:25,rarity:'Common',art:'rose'},
+  {id:'cake',name:'Торт',icon:'🎂',price:50,rarity:'Classic',art:'cake'},
+  {id:'bouquet',name:'Букет',icon:'💐',price:50,rarity:'Classic',art:'bouquet'},
+  {id:'rocket',name:'Ракета',icon:'🚀',price:50,rarity:'Classic',art:'rocket'},
+  {id:'champagne',name:'Бутылка шампанского',icon:'🍾',price:50,rarity:'Classic'},
+  {id:'trophy',name:'Трофей',icon:'🏆',price:100,rarity:'Rare'},
+  {id:'ring',name:'Кольцо',icon:'💍',price:100,rarity:'Rare',art:'ring'},
+  {id:'diamond',name:'Бриллиант',icon:'💎',price:100,rarity:'Rare',art:'diamond'},
+  {id:'torch',name:'Фонарик',icon:'🔦',price:450,rarity:'Collectible'},
+  {id:'street_lamp',name:'Уличный фонарь',icon:'💡',price:500,rarity:'Collectible'},
+  {id:'noodles',name:'Лапша',icon:'🍜',price:495,rarity:'Collectible'},
+  {id:'icecream',name:'Мороженое',icon:'🍨',price:500,rarity:'Collectible'},
+  {id:'popsicle',name:'Мороженое на палочке',icon:'🍦',price:525,rarity:'Collectible'},
+  {id:'liberty',name:'Статуя Свободы',icon:'🗽',price:600,rarity:'Collectible',art:'liberty_statue'},
+  {id:'puppy',name:'Щенок',icon:'🐶',price:614,rarity:'Collectible'},
+  {id:'lollipop',name:'Леденец',icon:'🍭',price:450,rarity:'Collectible',art:'lollipop'},
+  {id:'flamingo',name:'Фламинго',icon:'🦩',price:505,rarity:'Collectible',art:'flamingo'},
+  {id:'backpack',name:'Рюкзак',icon:'🎒',price:555,rarity:'Collectible',art:'backpack'},
+  {id:'poop',name:'Какашка',icon:'💩',price:480,rarity:'Collectible'},
+  {id:'mar8_cupcake',name:'Кекс 8 марта',icon:'🧁',price:465,rarity:'Collectible'},
+  {id:'collectible_rocket',name:'Ракета коллекционная',icon:'🚀',price:600,rarity:'Collectible',art:'rocket'},
+  {id:'moon_charm',name:'Лунный брелок',icon:'🌙',price:614,rarity:'Collectible',art:'moon_charm'},
+  {id:'hugging_cats',name:'Обнимающиеся коты',icon:'🐱',price:1754,rarity:'Rare',art:'cat_globe'},
+  {id:'collectible_cake',name:'Торт коллекционный',icon:'🎂',price:613,rarity:'Collectible',art:'cake'},
+  {id:'mar8_bouquet',name:'Букет 8 марта',icon:'💐',price:615,rarity:'Collectible',art:'bouquet'},
+  {id:'ufc_box',name:'Коробка UFC',icon:'🥊',price:1490,rarity:'Rare'},
+  {id:'halloween_eye',name:'Хэллоуинский глаз',icon:'👁️',price:781,rarity:'Collectible'},
+  {id:'feather',name:'Перо',icon:'🪶',price:780,rarity:'Collectible'},
+  {id:'notebook',name:'Блокнот',icon:'📓',price:588,rarity:'Collectible'},
+  {id:'bow',name:'Бант',icon:'🎀',price:613,rarity:'Collectible'},
+  {id:'star',name:'Звезда',icon:'⭐',price:900,rarity:'Rare'},
+  {id:'spider_heart',name:'Сердце-паук',icon:'🕷️',price:1600,rarity:'Rare'},
+  {id:'pumpkin',name:'Хэллоуинская тыква',icon:'🎃',price:1629,rarity:'Rare',art:'pumpkin'},
 ];
 
 function abumAdminIds() {
@@ -416,11 +395,11 @@ function abumMakeInventoryItem(giftId) {
     price: gift.price,
     rarity: gift.rarity,
     art: String(gift.art || ''),
-    estimated: Boolean(gift.estimated),
     acquiredAt: Date.now()
   };
 }
 
+const ABUM_HOUSE_RETURN = 0.90; // disclosed 10% house edge
 function abumRandomPercent() {
   const bytes = new Uint32Array(1);
   crypto.getRandomValues(bytes);
@@ -902,7 +881,7 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
       const sourcePrice = Number(source.price || 0);
       if (!Number.isFinite(sourcePrice) || sourcePrice < 1) throw abumError('У исходного подарка некорректная стоимость.', 400);
       if (target.price <= sourcePrice) throw abumError('Целевой подарок должен быть дороже исходного.', 400);
-      chance = Math.max(0.01, Math.min(95, Number(((sourcePrice / target.price) * (100 - ABUM_HOUSE_EDGE_PERCENT)).toFixed(2))));
+      chance = Math.max(0.01, Math.min(89.9, Number(((sourcePrice / target.price) * 100 * ABUM_HOUSE_RETURN).toFixed(2))));
       profile.attempts = Number(profile.attempts || 0) + 1;
       if (forceLossTestMode) {
         // Transparent test mode: show a loss but never remove the source item or create a reward.
@@ -926,8 +905,8 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
       stage = 'validate_star_bet';
       const stake = abumValidateStarsAmount(payload.stake, 'Ставка');
       chance = Number(payload.chance);
-      if (!Number.isFinite(chance) || chance < 0.1 || chance > 85.5) {
-        throw abumError('Шанс для режима ставок должен быть от 0,1% до 85,5% с учётом преимущества площадки 10%. Нулевой шанс недоступен.', 400);
+      if (!Number.isFinite(chance) || chance < 0.1 || chance > 89.9) {
+        throw abumError('Шанс для режима ставок должен быть от 0,1% до 89,9%. Нулевой шанс недоступен.', 400);
       }
       chance = Number(chance.toFixed(1));
       const rewardType = String(payload.rewardType || 'stars');
@@ -939,16 +918,16 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
         if (!targetGift) throw abumError('Целевой подарок не найден в каталоге.', 400);
         const maxAllowedStake = Math.floor(Number(targetGift.price) * 0.95);
         if (stake > maxAllowedStake || stake >= Number(targetGift.price)) {
-          throw abumError('Для цели «' + targetGift.name + '» ставка не может превышать ' + maxAllowedStake + ' игровых ⭐ (95% от цены цели).', 400);
+          throw abumError('Для шанса не выше 95% ставка на «' + targetGift.name + '» не может превышать ' + maxAllowedStake + ' игровых ⭐.', 400);
         }
         // The real probability is derived from server-side catalogue price and stake.
         // Do not trust the chance sent by the browser.
-        chance = Number(((stake / Number(targetGift.price)) * (100 - ABUM_HOUSE_EDGE_PERCENT)).toFixed(2));
-        if (chance < 0.01 || chance > 95) throw abumError('Для выбранной ставки фактический шанс должен быть больше 0% и не выше 95%.', 400);
+        chance = Number(((stake / Number(targetGift.price)) * 100 * ABUM_HOUSE_RETURN).toFixed(2));
+        if (chance < 0.01 || chance > 89.9) throw abumError('Для выбранной ставки фактический шанс должен быть больше 0% и не выше 89,9%.', 400);
         minStake = 1;
       } else if (rewardType === 'stars') {
-        minStake = Math.ceil(chance / ((100 - ABUM_HOUSE_EDGE_PERCENT) - chance));
-        grossPayout = Math.floor(stake * (100 - ABUM_HOUSE_EDGE_PERCENT) / chance);
+        minStake = Math.ceil(chance / (90 - chance));
+        grossPayout = Math.floor(stake * 90 / chance);
         if (stake < minStake || grossPayout <= stake) {
           throw abumError('Для шанса ' + chance + '% нужна ставка минимум ' + minStake + ' игровых ⭐, чтобы выигрыш был больше ставки.', 400);
         }
