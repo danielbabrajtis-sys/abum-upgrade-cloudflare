@@ -3,6 +3,13 @@
    API routes: /api/<handlerName>. Static app is served from public/index.html.
 */
 const logic = Object.create(null);
+// Publicly disclosed game advantage. The UI and server use the same exact rule.
+const ABUM_HOUSE_EDGE_PERCENT = 7;
+const ABUM_HOUSE_EDGE_FACTOR = (100 - ABUM_HOUSE_EDGE_PERCENT) / 100;
+function abumApplyHouseEdge(baseChance) {
+  const base = Number(baseChance || 0);
+  return Math.max(0.01, Number((base * ABUM_HOUSE_EDGE_FACTOR).toFixed(2)));
+}
 const process = { env: {} };
 const ABUM_KEY_FIELDS = {
   appusers: 'userId',
@@ -293,51 +300,45 @@ async function abumAudit(db, event, userId, metadata) {
 
 const ABUM_GIFT_CATALOG = [
   {id:'heart',name:'Сердце',icon:'❤️',price:15,rarity:'Common'},
-  {id:'teddy',name:'Мишка',icon:'🧸',price:15,rarity:'Common'},
-  {id:'gift',name:'Подарочная коробка',icon:'🎁',price:25,rarity:'Common'},
-  {id:'rose',name:'Красная роза',icon:'🌹',price:25,rarity:'Common'},
-  {id:'cake',name:'Именинный торт',icon:'🎂',price:50,rarity:'Classic'},
-  {id:'bouquet',name:'Букет цветов',icon:'💐',price:50,rarity:'Classic'},
-  {id:'rocket',name:'Ракета',icon:'🚀',price:50,rarity:'Classic'},
+  {id:'teddy',name:'Мишка',icon:'🧸',price:15,rarity:'Common',art:'teddy'},
+  {id:'gift',name:'Подарок',icon:'🎁',price:25,rarity:'Common',art:'giftbox'},
+  {id:'rose',name:'Роза',icon:'🌹',price:25,rarity:'Common',art:'rose'},
+  {id:'cake',name:'Торт',icon:'🎂',price:50,rarity:'Classic',art:'cake'},
+  {id:'bouquet',name:'Букет',icon:'💐',price:50,rarity:'Classic',art:'bouquet'},
+  {id:'rocket',name:'Ракета',icon:'🚀',price:50,rarity:'Classic',art:'rocket'},
   {id:'champagne',name:'Бутылка шампанского',icon:'🍾',price:50,rarity:'Classic'},
   {id:'trophy',name:'Трофей',icon:'🏆',price:100,rarity:'Rare'},
-  {id:'ring',name:'Бриллиантовое кольцо',icon:'💍',price:100,rarity:'Rare'},
-  {id:'diamond',name:'Бриллиант',icon:'💎',price:100,rarity:'Rare'},
-  {id:'torch',name:'Факел · Chill Flame',icon:'🔥',price:465,rarity:'Collectible'},
-  {id:'street_lamp',name:'Миражная лампа',icon:'🪔',price:500,rarity:'Collectible'},
-  {id:'noodles',name:'Instant Ramen · лапша',icon:'🍜',price:495,rarity:'Collectible'},
-  {id:'icecream',name:'Ice Cream · мороженое',icon:'🍨',price:500,rarity:'Collectible'},
-  {id:'popsicle',name:'Vice Cream',icon:'🍦',price:525,rarity:'Collectible'},
-  {id:'liberty',name:'Фигура Свободы',icon:'🗽',price:600,rarity:'Collectible'},
-  {id:'puppy',name:'Snoop Dogg',icon:'🐶',price:614,rarity:'Collectible'},
-  {id:'lollipop',name:'Lol Pop · леденец',icon:'🍭',price:450,rarity:'Collectible'},
-  {id:'flamingo',name:'Rare Bird · редкая птица',icon:'🦩',price:505,rarity:'Collectible'},
-  {id:'backpack',name:'Swag Bag · сумка',icon:'🎒',price:555,rarity:'Collectible'},
-  {id:'poop',name:'Happy Brownie',icon:'💩',price:480,rarity:'Collectible'},
-  {id:'mar8_cupcake',name:'Whip Cupcake · кекс',icon:'🧁',price:465,rarity:'Collectible'},
-  {id:'collectible_rocket',name:'Stellar Rocket',icon:'🚀',price:600,rarity:'Collectible'},
-  {id:'moon_charm',name:'Moon Pendant · лунный кулон',icon:'🌙',price:614,rarity:'Collectible'},
-  {id:'hugging_cats',name:'Kitty Medallion',icon:'🐱',price:1754,rarity:'Rare'},
-  {id:'collectible_cake',name:'Homemade Cake',icon:'🎂',price:613,rarity:'Collectible'},
-  {id:'mar8_bouquet',name:'Lush Bouquet · пышный букет',icon:'💐',price:615,rarity:'Collectible'},
-  {id:'ufc_box',name:'UFC Strike',icon:'🥊',price:1490,rarity:'Rare'},
-  {id:'halloween_eye',name:'Evil Eye · сглаз',icon:'👁️',price:781,rarity:'Collectible'},
-  {id:'feather',name:'Snow Mittens · варежки',icon:'🧤',price:780,rarity:'Collectible'},
-  {id:'notebook',name:'Star Notepad · блокнот',icon:'📓',price:588,rarity:'Collectible'},
-  {id:'bow',name:'Bow Tie · бабочка',icon:'🎀',price:613,rarity:'Collectible'},
-  {id:'star',name:'Hanging Star · подвесная звезда',icon:'⭐',price:900,rarity:'Rare'},
-  {id:'spider_heart',name:'Skull Flower · цветок-череп',icon:'🕷️',price:1600,rarity:'Rare'},
-  {id:'rose_box',name:'Eternal Rose · вечная роза',icon:'🌹',price:2460,rarity:'Rare'},
-  {id:'special_teddy',name:'Toy Bear · игрушечный мишка',icon:'🧸',price:3500,rarity:'Epic'},
-  {id:'pumpkin',name:'Mad Pumpkin · тыква',icon:'🎃',price:1629,rarity:'Rare'},
-  {id:'cigar',name:'Vintage Cigar · винтажная сигара',icon:'🚬',price:3857,rarity:'Epic'},
-  {id:'crystal',name:'Astral Shard · астральный осколок',icon:'🔮',price:5000,rarity:'Legendary'},
-  {id:'rare_gift',name:'Plush Pepe',icon:'🐸',price:7500,rarity:'Legendary'},
-  {id:'nft_gift',name:'Scared Cat · испуганный кот',icon:'🐈',price:10000,rarity:'Legendary'},
-  {id:'candy_cane',name:'Candy Cane · леденец-трость',icon:'🍬',price:400,rarity:'Collectible'},
-  {id:'snake_box',name:'Snake Box · коробка-змея',icon:'🐍',price:400,rarity:'Collectible'},
-  {id:'xmas_stocking',name:'Xmas Stocking · рождественский носок',icon:'🧦',price:400,rarity:'Collectible'},
-  {id:'lunar_snake',name:'Lunar Snake · лунная змея',icon:'🐍',price:425,rarity:'Collectible'}
+  {id:'ring',name:'Кольцо',icon:'💍',price:100,rarity:'Rare',art:'ring'},
+  {id:'diamond',name:'Бриллиант',icon:'💎',price:100,rarity:'Rare',art:'diamond'},
+  {id:'torch',name:'Фонарик',icon:'🔦',price:450,rarity:'Collectible'},
+  {id:'street_lamp',name:'Уличный фонарь',icon:'💡',price:500,rarity:'Collectible'},
+  {id:'noodles',name:'Лапша',icon:'🍜',price:495,rarity:'Collectible'},
+  {id:'icecream',name:'Мороженое',icon:'🍨',price:500,rarity:'Collectible'},
+  {id:'popsicle',name:'Мороженое на палочке',icon:'🍦',price:525,rarity:'Collectible'},
+  {id:'liberty',name:'Статуя Свободы',icon:'🗽',price:600,rarity:'Collectible',art:'liberty_statue'},
+  {id:'puppy',name:'Щенок',icon:'🐶',price:614,rarity:'Collectible'},
+  {id:'lollipop',name:'Леденец',icon:'🍭',price:450,rarity:'Collectible',art:'lollipop'},
+  {id:'flamingo',name:'Фламинго',icon:'🦩',price:505,rarity:'Collectible',art:'flamingo'},
+  {id:'backpack',name:'Рюкзак',icon:'🎒',price:555,rarity:'Collectible',art:'backpack'},
+  {id:'poop',name:'Какашка',icon:'💩',price:480,rarity:'Collectible'},
+  {id:'mar8_cupcake',name:'Кекс 8 марта',icon:'🧁',price:465,rarity:'Collectible'},
+  {id:'collectible_rocket',name:'Ракета коллекционная',icon:'🚀',price:600,rarity:'Collectible',art:'rocket'},
+  {id:'moon_charm',name:'Лунный брелок',icon:'🌙',price:614,rarity:'Collectible',art:'moon_charm'},
+  {id:'hugging_cats',name:'Обнимающиеся коты',icon:'🐱',price:1754,rarity:'Rare',art:'cat_globe'},
+  {id:'collectible_cake',name:'Торт коллекционный',icon:'🎂',price:613,rarity:'Collectible',art:'cake'},
+  {id:'mar8_bouquet',name:'Букет 8 марта',icon:'💐',price:615,rarity:'Collectible',art:'bouquet'},
+  {id:'ufc_box',name:'Коробка UFC',icon:'🥊',price:1490,rarity:'Rare'},
+  {id:'halloween_eye',name:'Хэллоуинский глаз',icon:'👁️',price:781,rarity:'Collectible'},
+  {id:'feather',name:'Перо',icon:'🪶',price:780,rarity:'Collectible'},
+  {id:'notebook',name:'Блокнот',icon:'📓',price:588,rarity:'Collectible'},
+  {id:'bow',name:'Бант',icon:'🎀',price:613,rarity:'Collectible'},
+  {id:'star',name:'Звезда',icon:'⭐',price:900,rarity:'Rare'},
+  {id:'spider_heart',name:'Сердце-паук',icon:'🕷️',price:1600,rarity:'Rare'},
+  {id:'rose_box',name:'Розы в коробке',icon:'🌹',price:2460,rarity:'Rare',art:'rose'},
+  {id:'special_teddy',name:'Особенный мишка',icon:'🧸',price:3500,rarity:'Epic',art:'teddy'},
+  {id:'pumpkin',name:'Хэллоуинская тыква',icon:'🎃',price:1629,rarity:'Rare',art:'pumpkin'},
+  {id:'cigar',name:'Сигара',icon:'🚬',price:3857,rarity:'Epic'},
+  {id:'crystal',name:'Кристалл',icon:'🔮',price:5000,rarity:'Legendary',art:'crystal'},
 ];
 
 function abumAdminIds() {
@@ -871,6 +872,7 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
     const mode = String(payload.mode || 'gift');
     let won = false;
     let chance = 0;
+    let baseChance = 0;
     let source = null;
     let reward = null;
     let payoutStars = 0;
@@ -890,7 +892,8 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
       const sourcePrice = Number(source.price || 0);
       if (!Number.isFinite(sourcePrice) || sourcePrice < 1) throw abumError('У исходного подарка некорректная стоимость.', 400);
       if (target.price <= sourcePrice) throw abumError('Целевой подарок должен быть дороже исходного.', 400);
-      chance = Math.max(0.01, Math.min(95, Number(((sourcePrice / target.price) * 100).toFixed(2))));
+      baseChance = Math.max(0.01, Math.min(95, Number(((sourcePrice / target.price) * 100).toFixed(2))));
+      chance = abumApplyHouseEdge(baseChance);
       profile.attempts = Number(profile.attempts || 0) + 1;
       if (forceLossTestMode) {
         // Transparent test mode: show a loss but never remove the source item or create a reward.
@@ -904,20 +907,20 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
           reward = abumMakeInventoryItem(target.id);
           profile.inventory.push(reward);
           profile.wins = Number(profile.wins || 0) + 1;
-          abumAddHistory(profile, 'Успех: ' + source.name + ' → ' + target.name + ' (' + chance + '%)', '🎉');
+          abumAddHistory(profile, 'Успех: ' + source.name + ' → ' + target.name + ' (фактический шанс ' + chance + '%, базовый ' + baseChance + '%, преимущество игры ' + ABUM_HOUSE_EDGE_PERCENT + '%)', '🎉');
         } else {
           sourceLossText = source.name;
-          abumAddHistory(profile, 'Неудача: потерян подарок ' + source.name + ' (цель: ' + target.name + ', шанс ' + chance + '%)', '💔');
+          abumAddHistory(profile, 'Неудача: потерян подарок ' + source.name + ' (цель: ' + target.name + ', фактический шанс ' + chance + '%, базовый ' + baseChance + '%, преимущество игры ' + ABUM_HOUSE_EDGE_PERCENT + '%)', '💔');
         }
       }
     } else if (mode === 'stars') {
       stage = 'validate_star_bet';
       const stake = abumValidateStarsAmount(payload.stake, 'Ставка');
-      chance = Number(payload.chance);
-      if (!Number.isFinite(chance) || chance < 0.1 || chance > 95) {
-        throw abumError('Шанс для режима ставок должен быть от 0,1% до 95%. Нулевой шанс недоступен.', 400);
+      baseChance = Number(payload.chance);
+      if (!Number.isFinite(baseChance) || baseChance < 0.1 || baseChance > 95) {
+        throw abumError('Базовый шанс для режима ставок должен быть от 0,1% до 95%. Фактический шанс с преимуществом игры указан в интерфейсе.', 400);
       }
-      chance = Number(chance.toFixed(1));
+      baseChance = Number(baseChance.toFixed(1));
       const rewardType = String(payload.rewardType || 'stars');
       let grossPayout = 0;
       let targetGift = null;
@@ -931,18 +934,19 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
         }
         // The real probability is derived from server-side catalogue price and stake.
         // Do not trust the chance sent by the browser.
-        chance = Number(((stake / Number(targetGift.price)) * 100).toFixed(2));
-        if (chance < 0.01 || chance > 95) throw abumError('Для выбранной ставки фактический шанс должен быть больше 0% и не выше 95%.', 400);
+        baseChance = Number(((stake / Number(targetGift.price)) * 100).toFixed(2));
+        if (baseChance < 0.01 || baseChance > 95) throw abumError('Для выбранной ставки базовый шанс должен быть больше 0% и не выше 95%.', 400);
         minStake = 1;
       } else if (rewardType === 'stars') {
-        minStake = Math.ceil(chance / (100 - chance));
-        grossPayout = Math.floor(stake * 100 / chance);
+        minStake = Math.ceil(baseChance / (100 - baseChance));
+        grossPayout = Math.floor(stake * 100 / baseChance);
         if (stake < minStake || grossPayout <= stake) {
-          throw abumError('Для шанса ' + chance + '% нужна ставка минимум ' + minStake + ' игровых ⭐, чтобы выигрыш был больше ставки.', 400);
+          throw abumError('Для базового шанса ' + baseChance + '% нужна ставка минимум ' + minStake + ' игровых ⭐, чтобы выплата была больше ставки.', 400);
         }
       } else {
         throw abumError('Выбери цель: игровые ⭐ или подарок.', 400);
       }
+      chance = abumApplyHouseEdge(baseChance);
       if (Number(profile.starsBalance || 0) < stake) {
         throw abumError('Недостаточно игровых ⭐ для этой ставки.', 400);
       }
@@ -964,17 +968,17 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
             reward = abumMakeInventoryItem(targetGift.id);
             profile.inventory.push(reward);
             payoutStars = 0;
-            abumAddHistory(profile, 'Ставка ' + stake + ' игровых ⭐: выигран подарок ' + targetGift.name + ' (шанс ' + chance + '%)', '🎉');
+            abumAddHistory(profile, 'Ставка ' + stake + ' игровых ⭐: выигран подарок ' + targetGift.name + ' (фактический шанс ' + chance + '%, базовый ' + baseChance + '%, преимущество игры ' + ABUM_HOUSE_EDGE_PERCENT + '%)', '🎉');
           } else {
             payoutStars = grossPayout;
             profile.starsBalance += grossPayout;
             reward = { name: 'Игровые ⭐', icon: '⭐', price: grossPayout, payout: grossPayout };
-            abumAddHistory(profile, 'Ставка ' + stake + ' игровых ⭐: выплата ' + grossPayout + ' ⭐ при шансе ' + chance + '%', '✨');
+            abumAddHistory(profile, 'Ставка ' + stake + ' игровых ⭐: выплата ' + grossPayout + ' ⭐ при фактическом шансе ' + chance + '%, базовый ' + baseChance + '%, преимущество игры ' + ABUM_HOUSE_EDGE_PERCENT + '%', '✨');
           }
         } else {
           payoutStars = 0;
           reward = null;
-          abumAddHistory(profile, 'Ставка ' + stake + ' игровых ⭐ проиграна (шанс ' + chance + '%)', '💔');
+          abumAddHistory(profile, 'Ставка ' + stake + ' игровых ⭐ проиграна (фактический шанс ' + chance + '%, базовый ' + baseChance + '%, преимущество игры ' + ABUM_HOUSE_EDGE_PERCENT + '%)', '💔');
         }
       }
     } else {
@@ -983,7 +987,7 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
 
     stage = 'save_upgrade';
     const saved = await abumSaveProfile(users, profile);
-    await abumAudit(db, 'upgrade_settled', auth.telegramUser.id, { mode, won, chance, stake: Number(source && source.price || 0), targetGiftId: String(payload.targetGiftId || '') });
+    await abumAudit(db, 'upgrade_settled', auth.telegramUser.id, { mode, won, baseChance, chance, houseEdgePercent: ABUM_HOUSE_EDGE_PERCENT, stake: Number(source && source.price || 0), targetGiftId: String(payload.targetGiftId || '') });
     stage = 'upgrade_response';
     response.statusCode = 200;
     response.data = {
@@ -991,6 +995,8 @@ logic['app_upgrade'] = async (query, body, db, response, params) => {
       mode,
       won,
       chance,
+      baseChance,
+      houseEdgePercent: ABUM_HOUSE_EDGE_PERCENT,
       source,
       reward,
       payoutStars,
