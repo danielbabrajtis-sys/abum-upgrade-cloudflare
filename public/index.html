@@ -171,15 +171,15 @@
     <label for="stakeInput">Размер ставки (игровые ⭐)</label>
     <div class="stake-row"><input id="stakeInput" type="number" min="1" max="1000000" step="1" value="300" inputmode="numeric"><button type="button" id="maxStakeBtn" class="max-stake-btn">МАКС</button></div>
     <label for="chanceRange">Шанс выигрыша</label>
-    <div class="range-caption"><span id="chanceMinCaption">0,1%</span><strong id="chanceValue">50%</strong><span id="chanceMaxCaption">88,35%</span></div>
-    <input id="chanceRange" type="range" min="0.1" max="88.35" step="0.1" value="46.5">
+    <div class="range-caption"><span id="chanceMinCaption">0,1%</span><strong id="chanceValue">50%</strong><span id="chanceMaxCaption">95%</span></div>
+    <input id="chanceRange" type="range" min="0.1" max="95" step="0.1" value="50">
     <div class="star-payout" id="starPayoutRow"><span>Выплата при победе</span><strong id="starPayout">2 ⭐</strong></div>
     <div id="starHint" class="inventory-desc">Выбери ставку и шанс: целевой подарок подберётся автоматически.</div>
     <button type="button" class="upgrade-btn" id="starUpgradeBtn">⚡ УЛУЧШИТЬ</button>
   </div>
   <div class="odds"><div class="odds-top"><span>Расчётный шанс успеха</span><strong id="oddsText">60%</strong></div><div class="meter"><div class="meter-fill" id="meterFill"></div></div></div>
   <button class="upgrade-btn" id="upgradeBtn">⚡ ЗАПУСТИТЬ АПГРЕЙД</button>
-  <p class="notice">Игровые ⭐ — внутренняя валюта. Показанный шанс — фактический и уже учитывает открытое преимущество игры 7%. Результаты и изменение баланса рассчитываются на сервере; реальные Telegram-подарки автоматически не передаются.</p>
+  <p class="notice">Игровые ⭐ — внутренняя валюта. Результаты и изменение баланса рассчитываются на сервере; реальные Telegram-подарки автоматически не передаются.</p>
   <div class="toast" id="toast" aria-live="polite"></div>
 </div>
   <div class="dial-wrap">
@@ -199,7 +199,7 @@
 </section>
 <section class="panel inventory" id="inventoryPanel">
   <div class="inventory-head"><h2>✨ КАТАЛОГ ЦЕЛЕЙ</h2><span class="count" id="giftCount">0</span></div>
-  <p class="inventory-desc">Выбери подарок, который хочешь получить. Фактический шанс рассчитывается на сервере и уже учитывает открытое преимущество игры 7%. Для коллекционных подарков цены в каталоге — фиксированные игровые оценки, не live-котировки перепродажи: рынок меняется и часто указывается в TON.</p>
+  <p class="inventory-desc">Выбери подарок, который хочешь получить. Шанс для апгрейда подарка рассчитывается на сервере по стоимости исходного и целевого предмета.</p>
   <div class="gift-grid" id="giftGrid"></div>
 </section>
 </main>
@@ -379,20 +379,8 @@ const gifts = [
  {id:"cigar",name:"Сигара",icon:"🚬",price:3857,rarity:"Epic"},
  {id:"crystal",name:"Кристалл",icon:"🔮",price:5000,rarity:"Legendary",art:"crystal"},
  {id:"rare_gift",name:"Редкий подарок",icon:"🎁",price:7500,rarity:"Legendary",art:"giftbox"},
- {id:"nft_gift",name:"NFT-подарок",icon:"🌌",price:10000,rarity:"Legendary",art:"crystal"},
- {id:"snoop_dogg",name:"Snoop Dogg",icon:"😎",price:200,rarity:"Collectible"},
- {id:"swag_bag",name:"Swag Bag",icon:"🛍️",price:500,rarity:"Collectible"},
- {id:"mini_oscar",name:"Мини-Оскар",icon:"🏆",price:500,rarity:"Collectible"},
- {id:"toy_bear",name:"Коллекционный мишка",icon:"🧸",price:500,rarity:"Collectible",art:"teddy"},
- {id:"precious_peach",name:"Precious Peach",icon:"🍑",price:1000,rarity:"Rare"},
- {id:"durovs_cap",name:"Кепка Дурова",icon:"🧢",price:1000,rarity:"Rare"},
- {id:"astral_shard",name:"Астральный осколок",icon:"💠",price:500,rarity:"Collectible"},
- {id:"nail_bracelet",name:"Nail Bracelet",icon:"📿",price:10000,rarity:"Legendary"},
- {id:"plush_pepe",name:"Plush Pepe",icon:"🐸",price:2000,rarity:"Legendary"},
- {id:"westside_sign",name:"Westside Sign",icon:"🪧",price:10000,rarity:"Legendary"}
+ {id:"nft_gift",name:"NFT-подарок",icon:"🌌",price:10000,rarity:"Legendary",art:"crystal"}
 ];
-const ABUM_ODDS_EDGE_FACTOR = 0.93; // displayed, disclosed chance includes a 7% house edge
-const ABUM_MAX_EFFECTIVE_CHANCE = 88.35;
 const $ = id => document.getElementById(id);
 let accountState = null;
 let serverMode = { forceLossTestMode: false };
@@ -418,15 +406,15 @@ function selectedSource(){return myInventory().find(item=>String(item.id)===Stri
 function selectedTarget(){return findGift(currentMode==="stars" && $("starRewardType") && $("starRewardType").value==="gift" ? $("starGiftTarget").value : selectedTargetGiftId) || gifts[2];}
 function getGiftOdds(source,target){
  if(!source||!target||!Number.isFinite(Number(source.price))||!Number.isFinite(Number(target.price))||Number(target.price)<=Number(source.price))return 0;
- return Math.max(0.01,Math.min(ABUM_MAX_EFFECTIVE_CHANCE,Number((Number(source.price)/Number(target.price)*100*ABUM_ODDS_EDGE_FACTOR).toFixed(2))));
+ return Math.max(0.01,Math.min(95,Number((Number(source.price)/Number(target.price)*100).toFixed(2))));
 }
-function starChance(){const n=Number($("chanceRange").value);return Number(Math.max(0.1,Math.min(ABUM_MAX_EFFECTIVE_CHANCE,Number.isFinite(n)&&n>0?n:46.5)).toFixed(1));}
+function starChance(){const n=Number($("chanceRange").value);return Number(Math.max(0.1,Math.min(95,Number.isFinite(n)&&n>0?n:50)).toFixed(1));}
 function starStake(){return Math.max(0,Math.floor(Number($("stakeInput").value)||0));}
 function currentStarBalance(){return Math.max(0,Math.floor(Number(accountState&&accountState.profile&&accountState.profile.starsBalance||0)));}
-function minStakeForChance(chance){return Math.ceil(chance/(100*ABUM_ODDS_EDGE_FACTOR-chance));}
-function starGrossPayout(){const stake=starStake(),chance=starChance();return chance>0?Math.floor(stake*100*ABUM_ODDS_EDGE_FACTOR/chance):0;}
+function minStakeForChance(chance){return Math.ceil(chance/(100-chance));}
+function starGrossPayout(){const stake=starStake(),chance=starChance();return chance>0?Math.floor(stake*100/chance):0;}
 function isWinPayoutValid(){return starGrossPayout()>starStake() && starStake()>=minStakeForChance(starChance());}
-function starGiftActualChance(target){target=target||selectedTarget();const stake=starStake(),price=Number(target&&target.price||0);return price>0&&stake>0?Math.min(ABUM_MAX_EFFECTIVE_CHANCE,Number((stake/price*100*ABUM_ODDS_EDGE_FACTOR).toFixed(2))):0;}
+function starGiftActualChance(target){target=target||selectedTarget();const stake=starStake(),price=Number(target&&target.price||0);return price>0&&stake>0?Math.min(95,Number((stake/price*100).toFixed(2))):0;}
 function maxGiftStake(target){return Math.max(0,Math.floor(Number(target&&target.price||0)*0.95));}
 function setStarTarget(id){
  if(!findGift(id))return;
@@ -448,44 +436,44 @@ function syncAutoTargetFromStake(useMaxBalance){
    if(fallback)setStarTarget(fallback.id);
    $("stakeInput").value="1";
    const actual=starGiftActualChance(fallback);
-   $("chanceRange").value=String(Number(Math.max(0.1,Math.min(ABUM_MAX_EFFECTIVE_CHANCE,Number(actual||requestedChance))).toFixed(1)));
+   $("chanceRange").value=String(Number(Math.max(0.1,Math.min(95,Number(actual||requestedChance))).toFixed(1)));
    return;
  }
  let entered=Math.floor(Number($("stakeInput").value)||1);
  entered=Math.max(1,Math.min(balance,entered));
- let desiredPrice=entered*100*ABUM_ODDS_EDGE_FACTOR/requestedChance;
+ let desiredPrice=entered*100/requestedChance;
  if(useMaxBalance){
    entered=balance;
-   desiredPrice=entered*100*ABUM_ODDS_EDGE_FACTOR/requestedChance;
+   desiredPrice=entered*100/requestedChance;
    const chosen=closestGiftForPrice(desiredPrice,g=>Number(g.price)>entered && entered<=maxGiftStake(g));
    setStarTarget(chosen.id);
    $("stakeInput").value=String(entered);
    const actual=starGiftActualChance(chosen);
-   $("chanceRange").value=String(Number(Math.max(0.1,Math.min(ABUM_MAX_EFFECTIVE_CHANCE,Number(actual||requestedChance))).toFixed(1)));
+   $("chanceRange").value=String(Number(Math.max(0.1,Math.min(95,Number(actual||requestedChance))).toFixed(1)));
    return;
  }
  const chosen=closestGiftForPrice(desiredPrice,g=>{
-   const needed=Math.max(1,Math.round(Number(g.price)*requestedChance/(100*ABUM_ODDS_EDGE_FACTOR)));
+   const needed=Math.max(1,Math.round(Number(g.price)*requestedChance/100));
    return needed<=balance && needed<=maxGiftStake(g) && needed<Number(g.price);
  });
- let stake=Math.max(1,Math.round(Number(chosen.price)*requestedChance/(100*ABUM_ODDS_EDGE_FACTOR)));
+ let stake=Math.max(1,Math.round(Number(chosen.price)*requestedChance/100));
  stake=Math.min(stake,balance,maxGiftStake(chosen));
  if(stake<1)stake=1;
  setStarTarget(chosen.id);
  $("stakeInput").value=String(stake);
  const actual=starGiftActualChance(chosen);
- $("chanceRange").value=String(Number(Math.max(0.1,Math.min(ABUM_MAX_EFFECTIVE_CHANCE,Number(actual||requestedChance))).toFixed(1)));
+ $("chanceRange").value=String(Number(Math.max(0.1,Math.min(95,Number(actual||requestedChance))).toFixed(1)));
 }
 function syncManualGiftStakeFromChance(){
  const target=selectedTarget();if(!target)return;
  const balance=currentStarBalance();
  const cap=Math.min(balance,maxGiftStake(target));
  if(cap<1){$("stakeInput").value=balance>0?"1":"0";return;}
- const desired=Math.max(1,Math.round(Number(target.price)*starChance()/(100*ABUM_ODDS_EDGE_FACTOR)));
+ const desired=Math.max(1,Math.round(Number(target.price)*starChance()/100));
  const stake=Math.max(1,Math.min(cap,desired));
  $("stakeInput").value=String(stake);
  const actual=starGiftActualChance(target);
- $("chanceRange").value=String(Number(Math.max(0.1,Math.min(ABUM_MAX_EFFECTIVE_CHANCE,Number(actual||0.1))).toFixed(1)));
+ $("chanceRange").value=String(Number(Math.max(0.1,Math.min(95,Number(actual||0.1))).toFixed(1)));
 }
 function syncManualGiftChanceFromStake(){
  const target=selectedTarget();if(!target)return;
@@ -496,7 +484,7 @@ function syncManualGiftChanceFromStake(){
  stake=Math.max(1,Math.min(cap,stake));
  $("stakeInput").value=String(stake);
  const actual=starGiftActualChance(target);
- $("chanceRange").value=String(Number(Math.max(0.1,Math.min(ABUM_MAX_EFFECTIVE_CHANCE,Number(actual||0.1))).toFixed(1)));
+ $("chanceRange").value=String(Number(Math.max(0.1,Math.min(95,Number(actual||0.1))).toFixed(1)));
 }
 function maxAllowedStarStake(){
  const balance=currentStarBalance();
@@ -708,7 +696,7 @@ function updateView(){
   $("sourceStageLabel").textContent="ТВОЯ СТАВКА";$("targetStageLabel").textContent=rewardType==="gift"?"ПОДАРОК ПРИ ПОБЕДЕ":"ВЫПЛАТА ПРИ ПОБЕДЕ";
   $("sourceArt").textContent="⭐";$("sourceName").textContent=starStake()+" игровых ⭐";$("sourcePrice").textContent="Твоя ставка";
   $("chanceValue").textContent=fmtPercent(actualGiftChance);
-  $("chanceRange").min="0.1";$("chanceRange").max=String(ABUM_MAX_EFFECTIVE_CHANCE);$("chanceRange").step="0.1";$("chanceMinCaption").textContent="0,1%";$("chanceMaxCaption").textContent="88,35%";
+  $("chanceRange").min="0.1";$("chanceRange").max="95";$("chanceRange").step="0.1";$("chanceMinCaption").textContent="0,1%";$("chanceMaxCaption").textContent="95%";
   const maxAllowed=rewardType==="gift"&&!autoTargetMode?Math.max(0,Math.min(1000000,balance,maxGiftStake(tgt))):Math.max(0,Math.min(1000000,balance));
   $("stakeInput").max=String(Math.max(1,maxAllowed));
   const min=rewardType==="gift"?1:minStakeForChance(starChance());
@@ -717,10 +705,10 @@ function updateView(){
     setArt($("targetArt"),tgt,"stage-art");$("targetName").textContent=tgt.name;$("targetPrice").textContent=fmt(tgt.price)+" · цель";$("starPayout").textContent=tgt.name;
     $("starHint").textContent=autoTargetMode
       ?"Автоцель выбрана по ставке и шансу. Сейчас: "+tgt.name+" за "+fmt(tgt.price)+", фактический шанс "+fmtPercent(actualGiftChance)+"."
-      :"Ручная цель: "+tgt.name+" за "+fmt(tgt.price)+". При изменении процента ставка пересчитывается; максимум — 88,35% (с учётом преимущества игры).";
+      :"Ручная цель: "+tgt.name+" за "+fmt(tgt.price)+". При изменении процента ставка пересчитывается; максимум — 95%.";
   }else{
     $("targetArt").textContent="✨";$("targetName").textContent=(valid?starGrossPayout():"—")+" игровых ⭐";$("targetPrice").textContent="Выплата при победе";$("starPayout").textContent=valid?fmt(starGrossPayout()):"—";
-    $("starHint").textContent=starStake()<min?"Для шанса "+fmtPercent(starChance())+" нужна ставка минимум "+min+" игровых ⭐, чтобы выплата была больше ставки.":"Выплата включает возвращаемую ставку. Показанный шанс — фактический; расчёт включает открытое преимущество игры 7%. Это внутриигровые ⭐, не реальные Telegram Stars.";
+    $("starHint").textContent=starStake()<min?"Для шанса "+fmtPercent(starChance())+" нужна ставка минимум "+min+" игровых ⭐, чтобы выплата была больше ставки.":"Выплата включает возвращаемую ставку. Это внутриигровые ⭐, не реальные Telegram Stars.";
   }
   $("sideSource").textContent=fmt(starStake());$("sideTarget").textContent=rewardType==="gift"?fmt(tgt.price):(valid?fmt(starGrossPayout()):"—");
  }else{
@@ -753,7 +741,7 @@ function applyState(data){
  const previousMode=serverMode;accountState=data;if(data&&data.serverMode)serverMode=data.serverMode;else serverMode=previousMode||{forceLossTestMode:false};
  const profile=data.profile||{};const user=data.user||{};const inventory=Array.isArray(profile.inventory)?profile.inventory:[];
  $("balance").textContent=Number(profile.starsBalance||0).toLocaleString("ru-RU");$("attempts").textContent=String(Number(profile.attempts||0));$("wins").textContent=String(Number(profile.wins||0));
- const uname=user.username?" (@"+user.username+")":"";$("serverStatus").textContent="✅ Telegram подтверждён: "+String(user.firstName||"игрок")+uname+" · ID "+String(user.id)+" · Баланс "+fmt(profile.starsBalance)+" · Подарков "+inventory.length;
+ const uname=user.username?" (@"+user.username+")":"";$("serverStatus").textContent="✅ Telegram подтверждён: "+String(user.firstName||"игрок")+uname+" · ID "+String(user.id)+(data.isAdmin?" · АДМИНИСТРАТОР":"")+" · Баланс "+fmt(profile.starsBalance)+" · Подарков "+inventory.length;
  $("serverStatus").style.borderColor="#54edac";
  $("adminPanel").classList.toggle("hidden",!data.isAdmin);
  if(data.isAdmin)populateAdminGiftSelect();
@@ -995,7 +983,7 @@ async function runUpgrade(){
   const payload=currentMode==="stars"?{mode:"stars",rewardType:$("starRewardType").value,stake:starStake(),chance:starChance(),targetGiftId:$("starRewardType").value==="gift"?$("starGiftTarget").value:undefined}:{mode:"gift",sourceItemId:selectedSourceItemId,targetGiftId:selectedTargetGiftId};
   const data=await apiPost("app_upgrade",payload);
   applyState(data);
-  const settledChance=Math.max(0.01,Math.min(ABUM_MAX_EFFECTIVE_CHANCE,Number(data.chance)||0.01));
+  const settledChance=Math.max(0.01,Math.min(95,Number(data.chance)||0.01));
   lastSettledChance=settledChance;
   $("dialOdds").textContent=fmtPercent(settledChance);$("oddsText").textContent=fmtPercent(settledChance);$("meterFill").style.width=settledChance+"%";$("dialFace").style.setProperty("--chance",settledChance+"%");
   $("toast").textContent="Апгрейд рассчитан сервером. Указатель вращается к результату…";
