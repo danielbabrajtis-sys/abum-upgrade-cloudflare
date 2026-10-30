@@ -335,29 +335,29 @@ const gifts = [
  {id:"trophy",name:"Трофей",originalGift:'Trophy',icon:"🏆",price:100,rarity:"Rare"},
  {id:"ring",name:"Кольцо",originalGift:'Bonded Ring',icon:"💍",price:100,rarity:"Rare",art:"ring"},
  {id:"diamond",name:"Бриллиант",originalGift:'Ion Gem',icon:"💎",price:100,rarity:"Rare",art:"diamond"},
- {id:"torch",name:"Фонарик",originalGift:'Torch',icon:"🔦",price:450,rarity:"Collectible"},
- {id:"street_lamp",name:"Уличный фонарь",originalGift:'Light Sword',icon:"💡",price:500,rarity:"Collectible"},
- {id:"noodles",name:"Лапша",originalGift:'Noodles',icon:"🍜",price:495,rarity:"Collectible"},
+ {id:"torch",name:"Фонарик",originalGift:'Light Sword',icon:"🔦",price:450,rarity:"Collectible"},
+ {id:"street_lamp",name:"Уличный фонарь",originalGift:'Mirage Lamp',icon:"💡",price:500,rarity:"Collectible"},
+ {id:"noodles",name:"Лапша",originalGift:'Instant Ramen',icon:"🍜",price:495,rarity:"Collectible"},
  {id:"icecream",name:"Мороженое",originalGift:'Ice Cream',icon:"🍨",price:500,rarity:"Collectible"},
- {id:"popsicle",name:"Мороженое на палочке",originalGift:'Ice Cream',icon:"🍦",price:525,rarity:"Collectible"},
- {id:"liberty",name:"Статуя Свободы",originalGift:'Statue of Liberty',icon:"🗽",price:600,rarity:"Collectible",art:"liberty_statue"},
+ {id:"popsicle",name:"Мороженое на палочке",originalGift:'Vice Cream',icon:"🍦",price:525,rarity:"Collectible"},
+ {id:"liberty",name:"Статуя Свободы",originalGift:'Liberty Figure',icon:"🗽",price:600,rarity:"Collectible",art:"liberty_statue"},
  {id:"puppy",name:"Щенок",originalGift:'Snoop Dogg',icon:"🐶",price:614,rarity:"Collectible"},
  {id:"lollipop",name:"Леденец",originalGift:'Lol Pop',icon:"🍭",price:450,rarity:"Collectible",art:"lollipop"},
- {id:"flamingo",name:"Фламинго",originalGift:'Flamingo',icon:"🦩",price:505,rarity:"Collectible",art:"flamingo"},
+ {id:"flamingo",name:"Фламинго",originalGift:'Rare Bird',icon:"🦩",price:505,rarity:"Collectible",art:"flamingo"},
  {id:"backpack",name:"Рюкзак",originalGift:'Swag Bag',icon:"🎒",price:555,rarity:"Collectible",art:"backpack"},
  {id:"poop",name:"Какашка",originalGift:'Happy Brownie',icon:"💩",price:480,rarity:"Collectible"},
- {id:"mar8_cupcake",name:"Кекс 8 марта",originalGift:'Homemade Cake',icon:"🧁",price:465,rarity:"Collectible"},
- {id:"collectible_rocket",name:"Ракета коллекционная",originalGift:'Rocket',icon:"🚀",price:600,rarity:"Collectible",art:"rocket"},
+ {id:"mar8_cupcake",name:"Кекс 8 марта",originalGift:'Whip Cupcake',icon:"🧁",price:465,rarity:"Collectible"},
+ {id:"collectible_rocket",name:"Ракета коллекционная",originalGift:'Stellar Rocket',icon:"🚀",price:600,rarity:"Collectible",art:"rocket"},
  {id:"moon_charm",name:"Лунный брелок",originalGift:'Moon Pendant',icon:"🌙",price:614,rarity:"Collectible",art:"moon_charm"},
- {id:"hugging_cats",name:"Обнимающиеся коты",originalGift:'Pet Snake',icon:"🐱",price:1754,rarity:"Rare",art:"cat_globe"},
+ {id:"hugging_cats",name:"Обнимающиеся коты",originalGift:'Scared Cat',icon:"🐱",price:1754,rarity:"Rare",art:"cat_globe"},
  {id:"collectible_cake",name:"Торт коллекционный",originalGift:'Homemade Cake',icon:"🎂",price:613,rarity:"Collectible",art:"cake"},
- {id:"mar8_bouquet",name:"Букет 8 марта",originalGift:'Bouquet',icon:"💐",price:615,rarity:"Collectible",art:"bouquet"},
+ {id:"mar8_bouquet",name:"Букет 8 марта",originalGift:'Lush Bouquet',icon:"💐",price:615,rarity:"Collectible",art:"bouquet"},
  {id:"ufc_box",name:"Коробка UFC",originalGift:'UFC Strike',icon:"🥊",price:1490,rarity:"Rare"},
  {id:"halloween_eye",name:"Хэллоуинский глаз",originalGift:'Evil Eye',icon:"👁️",price:781,rarity:"Collectible"},
  {id:"feather",name:"Перо",originalGift:'Plume',icon:"🪶",price:780,rarity:"Collectible"},
  {id:"notebook",name:"Блокнот",originalGift:'Desk Calendar',icon:"📓",price:588,rarity:"Collectible"},
  {id:"bow",name:"Бант",originalGift:'Bow Tie',icon:"🎀",price:613,rarity:"Collectible"},
- {id:"star",name:"Звезда",originalGift:'Star',icon:"⭐",price:900,rarity:"Rare"},
+ {id:"star",name:"Звезда",originalGift:'Star Notepad',icon:"⭐",price:900,rarity:"Rare"},
  {id:"spider_heart",name:"Сердце-паук",originalGift:'Cookie Heart',icon:"🕷️",price:1600,rarity:"Rare"},
  {id:"pumpkin",name:"Хэллоуинская тыква",originalGift:'Witch Hat',icon:"🎃",price:1629,rarity:"Rare",art:"pumpkin"},
 ];
@@ -515,8 +515,15 @@ function setArt(container, item, extraClass){
     img.referrerPolicy="no-referrer";
     img.className="telegram-original-art";
     img.src="";
+    let triedPng=false;
     img.onerror=function(){
-      // Keep the UI usable if GiftChanges is temporarily unavailable.
+      // Some source assets are available as PNG even when SVG rendering fails.
+      if(!triedPng && img.dataset.originalId){
+        triedPng=true;
+        img.src="https://api.changes.tg/original/"+encodeURIComponent(img.dataset.originalId)+".png?size=256";
+        return;
+      }
+      // Last-resort fallback only if the original Telegram asset is unavailable.
       const span=document.createElement("span");
       span.className="gift-art-fallback";
       span.textContent=fallback;
@@ -526,6 +533,7 @@ function setArt(container, item, extraClass){
     resolveOriginalGiftId(item.originalGift).then(id=>{
       if(!container.isConnected || !img.isConnected)return;
       if(id){
+        img.dataset.originalId=String(id);
         img.src="https://api.changes.tg/original/"+encodeURIComponent(id)+".svg";
       }else{
         const span=document.createElement("span");
